@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1
+        with:
+          ruby-version: "4.0"
+      - name: Validate release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REF_TYPE" = tag
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq 'if .isDraft then error("Release is still a draft") else . end'
+          version=$(ruby -Ilib -ralgosec/version -e 'print Algosec::VERSION')
+          test "$GITHUB_REF_NAME" = "v$version"
+          ruby -e 'abort "Missing changelog entry" unless File.read("CHANGELOG.md").include?("## #{ARGV.fetch(0)} -")' "$version"
+
+  verify:
+    needs: validate
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    env:
+      GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1
+        with:
+          ruby-version: "4.0"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: gem-${{ github.sha }}
+          path: pkg
+      - name: Verify exact CI artifact
+        run: ruby script/release.rb --check
+      - name: Configure RubyGems Trusted Publishing
+        if: env.GEM_HOST_API_KEY == ''
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
+      - name: Publish and verify RubyGems bytes
+        run: ruby script/release.rb --push
+      - name: Attach and verify GitHub Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gem="algosec-${GITHUB_REF_NAME#v}.gem"
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY"
+          gh release upload "$GITHUB_REF_NAME" "pkg/$gem" pkg/SHA256SUMS --repo "$GITHUB_REPOSITORY" --clobber
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/release-readback" --pattern "$gem" --pattern SHA256SUMS
+          cmp "pkg/$gem" "$RUNNER_TEMP/release-readback/$gem"
+          cmp pkg/SHA256SUMS "$RUNNER_TEMP/release-readback/SHA256SUMS"
