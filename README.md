@@ -1,61 +1,64 @@
 # algosec
 
-[![CI](https://github.com/gatework/algosec/actions/workflows/ci.yml/badge.svg)](https://github.com/gatework/algosec/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/algosec.svg)](https://rubygems.org/gems/algosec)
+[中文](README-zh.md)
 
-面向 AlgoSec 自动化的 Ruby gem。目前为初始骨架，提供命名空间、版本常量与基础异常；设备连接、配置解析和命令操作尚未实现。
+A Ruby library for firewall configuration parsing, policy analysis and planning, multi-vendor command generation, and device sessions. Extracted from the Algosec Rails application; the gem runs without starting Rails or a database service.
 
-## 安装
+## Installation
 
-要求 Ruby 3.3 或更高版本。
-
-```sh
-gem install algosec
-```
-
-或在 Gemfile 中添加：
-
-```ruby
-gem "algosec", "~> 0.1.0"
-```
-
-## 使用
-
-```ruby
-require "algosec"
-
-Algosec::VERSION # => "0.1.0"
-Algosec::Error   # StandardError 的子类
-```
-
-## 开发
+Requires **Ruby 4.0.7 or newer**. Version 0.3.0 provides the standalone firewall domain. Runtime dependencies include ActiveSupport 8.1 and net-connector 0.16 or newer within the declared major-version bounds.
 
 ```sh
 bundle install
 bundle exec rake
-bundle exec rake package
+bundle exec rake build
+gem install --local pkg/algosec-0.3.0.gem
 ```
 
-CI 覆盖 Ruby 3.3、3.4、4.0。打包步骤在临时 GEM_HOME 中安装并加载 gem，检查版本与加载路径。
+Applications can declare `gem "algosec", "~> 0.3.0"`. Use an explicit development `path:` only for local integration. Application lockfiles should record the resolved dependencies.
 
-## 发布
+```ruby
+require "algosec"
 
-1. 更新 `lib/algosec/version.rb` 与 `CHANGELOG.md`，提交并推送到 `main`。
-2. 等待该提交的 CI 通过，创建并推送同版本标签，例如 `v0.1.1`。
-3. 在 GitHub 发布该标签的 Release；`release.yml` 会重新运行完整 CI，下载通过验证的 gem，发布到 RubyGems，再将相同的 gem 与 `SHA256SUMS` 附加到 Release。
-
-```sh
-git tag -a v0.1.1 -m "Release 0.1.1"
-git push origin v0.1.1
-gh release create v0.1.1 --verify-tag --title v0.1.1 --notes-file CHANGELOG.md
+result = Algosec::Config::Parser.perform(
+  "set security address-book global address web 192.0.2.10/32\n",
+  vendor: :srx, device_id: 1
+)
+puts result.complete?
+snapshot = Algosec::Policy::Snapshot.from_config(result)
 ```
 
-本仓库已配置 [RubyGems Trusted Publishing](https://guides.rubygems.org/trusted-publishing/)，通过 GitHub OIDC 获取短期发布凭据，无需长期 API key 或手动 OTP。RubyGems 上的 gem `algosec` 信任 owner `gatework`、repository `algosec`、workflow `release.yml`、environment `release`；发布环境仅允许 `v*` 标签。
+The self-checking [offline example](examples/offline.rb) parses a synthetic policy and verifies a cache round trip. Run `bundle exec ruby examples/offline.rb`.
 
-只有主动切换为 API key 认证时，才需要设置 `release` environment 的 `RUBYGEMS_API_KEY` secret。
+The [policy lifecycle example](examples/policy_lifecycle.rb) exercises configuration JSON restoration, exact packet evaluation, redundant-rule reclamation, approved-input reconstruction and independent native readback. It also rejects readback where the selected rule was never removed. Run `bundle exec ruby examples/policy_lifecycle.rb` without device or database access.
 
-发布后最多等待 10 分钟，核对 RubyGems 版本与下载字节。失败时优先重新运行失败的 job，以复用原 CI 产物。`workflow_dispatch` 仅接受版本标签，并要求 GitHub Release 已存在。已发布的相同版本只有校验和一致才可继续；不同内容必须提升版本号。
+## Boundaries
 
-## 许可
+- `Elements`, address/service expressions, `Config`, and `Policy` represent firewall facts and policy decisions.
+- `Vendors` owns platform declarations and semantics. Discover actual capabilities with `Algosec::Vendors.names(:parser)`, `names(:policy)`, and `names(:connector)`.
+- `Connector` and `DeviceSession` use `net-connector` and `ctx_driver`; configuration source tracking uses `ctx_parser`.
+- `Deployment` coordinates plans, sessions, execution receipts, persistence confirmation and independent readback through host-supplied adapters.
+- ActiveSupport provides time zones, cache stores, and Ruby extensions; Nokogiri handles Palo Alto XML. Independence from the Rails application does not mean avoiding mature external dependencies.
+- Persistence, authorization, credentials, job recovery, HTTP, and application workflows remain the host application's responsibility.
 
-MIT，见 [LICENSE](LICENSE)。本项目由 gatework 维护，与设备厂商无隶属关系。
+Incomplete configuration remains incomplete. `Policy::Snapshot.from_config` rejects it by default. Command generation produces reviewable text; executing it requires an explicit device-session operation. Offline tests do not validate firmware behavior.
+
+## Cache integration
+
+```ruby
+cache = Algosec::Config::Cache.new                         # Per-instance memory cache
+cache = Algosec::Config::Cache.new(directory: "/tmp/fw")  # Explicit FileStore
+cache = Algosec::Config::Cache.new(store: Rails.cache)     # Host-supplied store
+```
+
+`ALGOSEC_CACHE_DIR` also selects FileStore. A store and a directory cannot be combined. The gem neither probes Rails nor writes into its installation directory. Persisted cache contains source configuration and must remain in a trusted, access-controlled location.
+
+## Development and release
+
+`bundle exec rake` runs the existing Minitest domain suite, RuboCop, and offline examples. Tests use synthetic or sanitized fixtures and require no application database. Rails-specific integration tests remain in the application.
+
+`bundle exec rake build` creates `pkg/algosec-0.3.0.gem` and `pkg/SHA256SUMS`. `ruby script/verify_package.rb pkg/algosec-0.3.0.gem` checks packaged source and performs an isolated install outside the checkout. Test data, local backups, credentials, logs, and build outputs are excluded from the package.
+
+Canonical objects use Palo Alto terminology while vendor adapters retain native execution semantics. See [architecture and integration](docs/architecture.md), [vendor capabilities and evidence boundaries](docs/capabilities.md), [release procedure](docs/release.md), and [changes](CHANGELOG.md). Source and releases are maintained at [gatework/algosec](https://github.com/gatework/algosec).
+
+MIT, see [LICENSE](LICENSE).

@@ -1,0 +1,1027 @@
+{
+  "schema_version": 2,
+  "semantic_version": "firewall-domain-v1",
+  "operation": "migrate",
+  "script": "config firewall address\nedit \"10.0.0.0/24\"\nset subnet 10.0.0.0 255.255.255.0\nnext\nend\nconfig firewall address\nedit \"192.0.2.1/32\"\nset subnet 192.0.2.1 255.255.255.255\nnext\nend\nconfig firewall service custom\nedit \"443\"\nset protocol TCP/UDP/SCTP\nset tcp-portrange 443\nnext\nend\nconfig firewall policy\nedit 0\nset srcintf \"inside\"\nset dstintf \"outside\"\nset srcaddr \"10.0.0.0/24\"\nset dstaddr \"192.0.2.1/32\"\nset action accept\nset schedule \"always\"\nset service \"443\"\nnext\nend\n",
+  "changes": [
+    {
+      "source_rule_id": "root/r1",
+      "action": "allow",
+      "decision": "permit",
+      "log": null,
+      "log_enabled": null,
+      "source_zone_pairs": [
+        [
+          "inside",
+          "outside"
+        ]
+      ],
+      "scope_requested": false,
+      "results": [
+        {
+          "from_zone": "inside",
+          "to_zone": "outside",
+          "sources": [
+            "10.0.0.0/24"
+          ],
+          "destinations": [
+            "192.0.2.1/32"
+          ],
+          "services": [
+            "tcp/443"
+          ],
+          "schedule": null
+        }
+      ]
+    }
+  ],
+  "target_baseline": {
+    "device_id": 1,
+    "vendor": "fortinet",
+    "revision": "target",
+    "software_version": null,
+    "settings": {},
+    "semantic_version": "firewall-domain-v1"
+  },
+  "source_baseline": {
+    "device_id": 1,
+    "vendor": "fortinet",
+    "revision": "source",
+    "software_version": null,
+    "settings": {},
+    "semantic_version": "firewall-domain-v1"
+  },
+  "at_epoch": [
+    1792719950970073,
+    1000000
+  ],
+  "proof_limit": 4096,
+  "intents": [
+    {
+      "operation": "create",
+      "rule_id": null,
+      "rule": 0,
+      "placement": "append",
+      "before": null,
+      "after": null
+    }
+  ],
+  "declarations": {
+    "kind": "proposed_graph",
+    "schema_version": 1,
+    "semantic_version": "firewall-domain-v1",
+    "context": {
+      "vendor": "fortinet",
+      "device_id": 1,
+      "definition": "fortinet",
+      "device_name": null,
+      "settings": {
+        "vdom": "root"
+      },
+      "reference_time": "2026-10-23T01:45:50.970073000Z",
+      "time_zone": null,
+      "dns_context": null
+    },
+    "nodes": [
+      {
+        "id": "n000001",
+        "kind": "security_rule",
+        "identity_fields": [
+          "root",
+          "pending_c49714694b326c9d92a1"
+        ],
+        "attributes": {
+          "native_rule_id": "pending_c49714694b326c9d92a1",
+          "rule_set": "root",
+          "rule_number": null,
+          "rule_type": null,
+          "native_rule_type": "object",
+          "from_zones": [
+            "inside"
+          ],
+          "to_zones": [
+            "outside"
+          ],
+          "from_interface": null,
+          "dst_interfaces": [],
+          "action": "allow",
+          "native_action": "accept",
+          "status": "enable",
+          "log": null,
+          "log_enabled": null,
+          "schedule_name": null,
+          "applications": [],
+          "source_users": [],
+          "service_selection": "explicit",
+          "unparsed_commands_metadata": {
+            "declared": false,
+            "count": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "vendor_data": {},
+          "name": null,
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": "root",
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          },
+          "nat": false,
+          "conditions": {}
+        },
+        "edges": {
+          "sources": "n000002",
+          "destinations": "n000004",
+          "services": "n000006",
+          "schedule": null
+        }
+      },
+      {
+        "id": "n000002",
+        "kind": "address_group",
+        "identity_fields": [
+          "sources"
+        ],
+        "attributes": {
+          "zone": "inside",
+          "name": "sources",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {
+          "members": [
+            {
+              "name": "generated:10.0.0.0/24",
+              "node": "n000003"
+            }
+          ]
+        }
+      },
+      {
+        "id": "n000003",
+        "kind": "address_object",
+        "identity_fields": [
+          "10.0.0.0/24"
+        ],
+        "attributes": {
+          "zone": "inside",
+          "direct_member": [
+            {
+              "type": "subnet",
+              "value": "10.0.0.0/24"
+            }
+          ],
+          "unresolved": [],
+          "excluded_member": [],
+          "dns_answers": {},
+          "name": "10.0.0.0/24",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {
+          "references": []
+        }
+      },
+      {
+        "id": "n000004",
+        "kind": "address_group",
+        "identity_fields": [
+          "destinations"
+        ],
+        "attributes": {
+          "zone": "outside",
+          "name": "destinations",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {
+          "members": [
+            {
+              "name": "generated:192.0.2.1/32",
+              "node": "n000005"
+            }
+          ]
+        }
+      },
+      {
+        "id": "n000005",
+        "kind": "address_object",
+        "identity_fields": [
+          "192.0.2.1/32"
+        ],
+        "attributes": {
+          "zone": "outside",
+          "direct_member": [
+            {
+              "type": "subnet",
+              "value": "192.0.2.1/32"
+            }
+          ],
+          "unresolved": [],
+          "excluded_member": [],
+          "dns_answers": {},
+          "name": "192.0.2.1/32",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {
+          "references": []
+        }
+      },
+      {
+        "id": "n000006",
+        "kind": "service_group",
+        "identity_fields": [
+          "services"
+        ],
+        "attributes": {
+          "protocol": null,
+          "name": "services",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {
+          "members": [
+            {
+              "name": "generated:tcp/443",
+              "node": "n000007"
+            }
+          ]
+        }
+      },
+      {
+        "id": "n000007",
+        "kind": "service_object",
+        "identity_fields": [
+          "tcp/443"
+        ],
+        "attributes": {
+          "terms": [
+            {
+              "protocol": "tcp",
+              "source_port": "0-65535",
+              "destination_port": "443",
+              "term": null,
+              "uuid": null,
+              "timeout": null
+            }
+          ],
+          "name": "tcp/443",
+          "description": null,
+          "ref_count": 0,
+          "config_present": false,
+          "scope": {
+            "device_id": 1,
+            "virtual_system": null,
+            "rulebase": null,
+            "address_book": null,
+            "zone": null
+          }
+        },
+        "edges": {}
+      }
+    ],
+    "catalog": [
+      "n000001"
+    ],
+    "builtin_services": []
+  },
+  "targets": [
+    {
+      "traffic": [
+        {
+          "family": "ipv4",
+          "source_addresses": [
+            [
+              167772160,
+              167772415
+            ]
+          ],
+          "destination_addresses": [
+            [
+              3221225985,
+              3221225985
+            ]
+          ],
+          "protocols": [
+            [
+              6,
+              6
+            ]
+          ],
+          "source_ports": [
+            [
+              0,
+              65535
+            ]
+          ],
+          "destination_ports": [
+            [
+              443,
+              443
+            ]
+          ]
+        }
+      ],
+      "action": "allow",
+      "context": {
+        "from_zone": "inside",
+        "to_zone": "outside",
+        "rule_set": null,
+        "application": null,
+        "source_user": null
+      },
+      "metadata": {
+        "log": null,
+        "log_enabled": null
+      },
+      "effective_window": null
+    }
+  ],
+  "required_effects": [
+    "nat"
+  ],
+  "effects": {
+    "nat": {
+      "kind": "nat",
+      "candidate": {
+        "kind": "proposed_graph",
+        "schema_version": 1,
+        "semantic_version": "firewall-domain-v1",
+        "context": {
+          "vendor": "fortinet",
+          "device_id": 1,
+          "definition": "fortinet",
+          "device_name": null,
+          "settings": {
+            "vdom": "root"
+          },
+          "reference_time": "2026-10-23T01:45:50.970073000Z",
+          "time_zone": null,
+          "dns_context": null
+        },
+        "nodes": [
+          {
+            "id": "n000001",
+            "kind": "zone",
+            "identity_fields": [
+              "inside"
+            ],
+            "attributes": {
+              "acl_name": "inside_acl",
+              "vrf": "default",
+              "mode": "routed",
+              "seed_reachable": [],
+              "name": "inside",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "interfaces": [
+                "n000002"
+              ]
+            }
+          },
+          {
+            "id": "n000002",
+            "kind": "interface",
+            "identity_fields": [
+              "inside"
+            ],
+            "attributes": {
+              "ipaddr": null,
+              "mode": "layer2",
+              "zone": "inside",
+              "vrf": "root",
+              "access_mode": null,
+              "vlans": [],
+              "seed_reachable": [],
+              "aggregate": null,
+              "ipv6_addresses": [],
+              "name": "inside",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "routes": [],
+              "vlan_interfaces": []
+            }
+          },
+          {
+            "id": "n000003",
+            "kind": "zone",
+            "identity_fields": [
+              "outside"
+            ],
+            "attributes": {
+              "acl_name": "inside_acl",
+              "vrf": "default",
+              "mode": "routed",
+              "seed_reachable": [],
+              "name": "outside",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "interfaces": [
+                "n000004"
+              ]
+            }
+          },
+          {
+            "id": "n000004",
+            "kind": "interface",
+            "identity_fields": [
+              "outside"
+            ],
+            "attributes": {
+              "ipaddr": null,
+              "mode": "layer2",
+              "zone": "outside",
+              "vrf": "root",
+              "access_mode": null,
+              "vlans": [],
+              "seed_reachable": [],
+              "aggregate": null,
+              "ipv6_addresses": [],
+              "name": "outside",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "routes": [],
+              "vlan_interfaces": []
+            }
+          },
+          {
+            "id": "n000005",
+            "kind": "security_rule",
+            "identity_fields": [
+              "root",
+              "existing-nat-policy"
+            ],
+            "attributes": {
+              "native_rule_id": "existing-nat-policy",
+              "rule_set": "root",
+              "rule_number": 1,
+              "rule_type": null,
+              "native_rule_type": "object",
+              "from_zones": [
+                "inside"
+              ],
+              "to_zones": [
+                "outside"
+              ],
+              "from_interface": null,
+              "dst_interfaces": [],
+              "action": "allow",
+              "native_action": "accept",
+              "status": "enable",
+              "log": null,
+              "log_enabled": null,
+              "schedule_name": null,
+              "applications": [],
+              "source_users": [],
+              "service_selection": "explicit",
+              "unparsed_commands_metadata": {
+                "declared": false,
+                "count": 0,
+                "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+              },
+              "vendor_data": {},
+              "name": "existing-nat-policy",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": "root",
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              },
+              "nat": true,
+              "conditions": {}
+            },
+            "edges": {
+              "sources": "n000006",
+              "destinations": "n000008",
+              "services": "n000010",
+              "schedule": null
+            }
+          },
+          {
+            "id": "n000006",
+            "kind": "address_group",
+            "identity_fields": [
+              "sources"
+            ],
+            "attributes": {
+              "zone": null,
+              "name": "sources",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": "root",
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "sources",
+                  "node": "n000007"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000007",
+            "kind": "address_object",
+            "identity_fields": [
+              "sources"
+            ],
+            "attributes": {
+              "zone": "inside",
+              "direct_member": [
+                {
+                  "type": "subnet",
+                  "value": "10.0.0.0/24"
+                }
+              ],
+              "unresolved": [],
+              "excluded_member": [],
+              "dns_answers": {},
+              "name": "sources",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "references": []
+            }
+          },
+          {
+            "id": "n000008",
+            "kind": "address_group",
+            "identity_fields": [
+              "destinations"
+            ],
+            "attributes": {
+              "zone": null,
+              "name": "destinations",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": "root",
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "destinations",
+                  "node": "n000009"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000009",
+            "kind": "address_object",
+            "identity_fields": [
+              "destinations"
+            ],
+            "attributes": {
+              "zone": "outside",
+              "direct_member": [
+                {
+                  "type": "subnet",
+                  "value": "192.0.2.1/32"
+                }
+              ],
+              "unresolved": [],
+              "excluded_member": [],
+              "dns_answers": {},
+              "name": "destinations",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "references": []
+            }
+          },
+          {
+            "id": "n000010",
+            "kind": "service_group",
+            "identity_fields": [
+              "services"
+            ],
+            "attributes": {
+              "protocol": null,
+              "name": "services",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": "root",
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "service0",
+                  "node": "n000011"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000011",
+            "kind": "service_object",
+            "identity_fields": [
+              "service0"
+            ],
+            "attributes": {
+              "terms": [
+                {
+                  "protocol": "tcp",
+                  "source_port": "0-65535",
+                  "destination_port": "443",
+                  "term": null,
+                  "uuid": null,
+                  "timeout": null
+                }
+              ],
+              "name": "service0",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {}
+          },
+          {
+            "id": "n000012",
+            "kind": "security_rule",
+            "identity_fields": [
+              "root",
+              "pending_c49714694b326c9d92a1"
+            ],
+            "attributes": {
+              "native_rule_id": "pending_c49714694b326c9d92a1",
+              "rule_set": "root",
+              "rule_number": 2,
+              "rule_type": null,
+              "native_rule_type": "object",
+              "from_zones": [
+                "inside"
+              ],
+              "to_zones": [
+                "outside"
+              ],
+              "from_interface": null,
+              "dst_interfaces": [],
+              "action": "allow",
+              "native_action": "accept",
+              "status": "enable",
+              "log": null,
+              "log_enabled": null,
+              "schedule_name": null,
+              "applications": [],
+              "source_users": [],
+              "service_selection": "explicit",
+              "unparsed_commands_metadata": {
+                "declared": false,
+                "count": 0,
+                "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+              },
+              "vendor_data": {},
+              "name": null,
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": "root",
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              },
+              "nat": false,
+              "conditions": {}
+            },
+            "edges": {
+              "sources": "n000013",
+              "destinations": "n000015",
+              "services": "n000017",
+              "schedule": null
+            }
+          },
+          {
+            "id": "n000013",
+            "kind": "address_group",
+            "identity_fields": [
+              "sources"
+            ],
+            "attributes": {
+              "zone": "inside",
+              "name": "sources",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "generated:10.0.0.0/24",
+                  "node": "n000014"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000014",
+            "kind": "address_object",
+            "identity_fields": [
+              "10.0.0.0/24"
+            ],
+            "attributes": {
+              "zone": "inside",
+              "direct_member": [
+                {
+                  "type": "subnet",
+                  "value": "10.0.0.0/24"
+                }
+              ],
+              "unresolved": [],
+              "excluded_member": [],
+              "dns_answers": {},
+              "name": "10.0.0.0/24",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "references": []
+            }
+          },
+          {
+            "id": "n000015",
+            "kind": "address_group",
+            "identity_fields": [
+              "destinations"
+            ],
+            "attributes": {
+              "zone": "outside",
+              "name": "destinations",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "generated:192.0.2.1/32",
+                  "node": "n000016"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000016",
+            "kind": "address_object",
+            "identity_fields": [
+              "192.0.2.1/32"
+            ],
+            "attributes": {
+              "zone": "outside",
+              "direct_member": [
+                {
+                  "type": "subnet",
+                  "value": "192.0.2.1/32"
+                }
+              ],
+              "unresolved": [],
+              "excluded_member": [],
+              "dns_answers": {},
+              "name": "192.0.2.1/32",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "references": []
+            }
+          },
+          {
+            "id": "n000017",
+            "kind": "service_group",
+            "identity_fields": [
+              "services"
+            ],
+            "attributes": {
+              "protocol": null,
+              "name": "services",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {
+              "members": [
+                {
+                  "name": "generated:tcp/443",
+                  "node": "n000018"
+                }
+              ]
+            }
+          },
+          {
+            "id": "n000018",
+            "kind": "service_object",
+            "identity_fields": [
+              "tcp/443"
+            ],
+            "attributes": {
+              "terms": [
+                {
+                  "protocol": "tcp",
+                  "source_port": "0-65535",
+                  "destination_port": "443",
+                  "term": null,
+                  "uuid": null,
+                  "timeout": null
+                }
+              ],
+              "name": "tcp/443",
+              "description": null,
+              "ref_count": 0,
+              "config_present": false,
+              "scope": {
+                "device_id": 1,
+                "virtual_system": null,
+                "rulebase": null,
+                "address_book": null,
+                "zone": null
+              }
+            },
+            "edges": {}
+          }
+        ],
+        "catalog": [
+          "n000001",
+          "n000003",
+          "n000005",
+          "n000012"
+        ],
+        "builtin_services": []
+      },
+      "expectations": [],
+      "require_untranslated": true
+    }
+  }
+}

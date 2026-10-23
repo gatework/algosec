@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module Algosec
-  VERSION = "0.1.0"
+  SEMANTIC_VERSION = "firewall-domain-v8".freeze
+  VERSION = "0.3.0"
 end
