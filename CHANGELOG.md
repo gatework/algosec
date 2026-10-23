@@ -4,6 +4,8 @@
 
 ## 0.3.0 (2026-10-23)
 
+- Initialize the OfflineCheck namespace before loading implementations so nested entrypoints load in either order.
+
 - Bind target and source snapshot time zones before deployment writes and when restoring approved plans or proposed graphs. Snapshot owns the shared immutable baseline used by Plan, ChangeSet and effect proofs; clock-context drift can no longer be deferred until readback.
 - Advance semantic documents and approvals to `firewall-domain-v8` and policy revisions to v27, preserving v7 group semantics. Host baseline contexts must include `time_zone`; old approvals require replanning. Configuration caches remain v82 because this change adds no stored object state.
 - Prove destination port relations after native rule selection instead of accepting independent coverage of the two port sets, including Huawei server-map lookups and consumed-mapping validation. Preserve per-protocol offsets, constants and holes when segmenting requests, and retain unknown aliases during reverse discovery.
