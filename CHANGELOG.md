@@ -27,7 +27,7 @@
 - Implement verified convergence, scoped cross-vendor migration and evidence-based reclamation with independent native readback.
 - Add versioned configuration and approved-plan documents; reconstruct inputs and rerun proofs after restoration.
 - Coordinate deployment receipts, save confirmation and readback through injected session and journal protocols.
-- Integrate the Rails host with encrypted documents, durable claims, approval binding, isolated preparation and atomic result publication.
+- Provide configuration, approval and deployment protocols for host adapters; encryption, durable claims and persistence remain in the host application.
 - Require net-connector 0.16 or newer; invalidate the previous object-cache and policy revision.
 - Extend offline examples, package verification and capability documentation. Offline checks do not establish live-device behavior.
 - Preserve multiple PAN-OS schedule declarations, Neteye source-port limits and unsupported SRX NAT interface context; retain those conditions through configuration documents.
