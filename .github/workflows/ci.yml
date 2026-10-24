@@ -32,7 +32,7 @@ jobs:
       - name: Record artifact checksum
         run: |
           ruby -rdigest -e 'files = Dir["pkg/*.gem"]; abort "Expected one gem" unless files.one?; File.write("pkg/SHA256SUMS", "#{Digest::SHA256.file(files.first).hexdigest}  #{File.basename(files.first)}\n")'
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: matrix.os == 'ubuntu-latest'
         with:
           name: gem-${{ github.sha }}
